@@ -34,11 +34,11 @@ namespace Unigeo.Editor
                 if (scope.changed)
                 {
                     Undo.RecordObject(splineViewer, "Set closed");
-                    splineViewer.Spline.Closed = closed;
+                    // splineViewer.Spline.Closed = closed;
                 }
             }
 
-            if (selectedIndex >= 0 && selectedIndex < splineViewer.Spline.ControlPoints.Count)
+            if (selectedIndex >= 0 && selectedIndex < splineViewer.Spline.ControlPointCount)
             {
                 GUILayout.Label($"Selected Point ({selectedIndex})");
                 using (var scope = new EditorGUI.ChangeCheckScope())
@@ -53,24 +53,27 @@ namespace Unigeo.Editor
                 }
             }
 
-            if (GUILayout.Button("Add Curve"))
-            {
-                Undo.RecordObject(splineViewer, "Add Curve");
-                splineViewer.Spline.AddCurve();
-                EditorUtility.SetDirty(splineViewer);
-            }
+//            if (GUILayout.Button("Add Curve"))
+//            {
+//                Undo.RecordObject(splineViewer, "Add Curve");
+//                splineViewer.Spline.AddCurve();
+//                EditorUtility.SetDirty(splineViewer);
+//            }
 
             serializedObject.ApplyModifiedProperties();
         }
 
         void OnSceneGUI()
         {
+            if (splineViewer.Spline == null)
+                return;
+
             handleRotation = Tools.pivotRotation == PivotRotation.Local
                 ? handleTransform.rotation
                 : Quaternion.identity;
 
             var p0 = ShowPoint(0);
-            for (var i = 1; i < splineViewer.Spline.ControlPoints.Count; i += 3)
+            for (var i = 1; i < splineViewer.Spline.ControlPointCount; i += 3)
             {
                 var p1 = ShowPoint(i);
                 var p2 = ShowPoint(i + 1);
@@ -86,7 +89,7 @@ namespace Unigeo.Editor
             var currentPoint = handleTransform.TransformPoint(splineViewer.Spline.GetPoint(0f));
 
             var stepsProp = serializedObject.FindProperty("steps");
-            var segments = stepsProp.intValue * splineViewer.Spline.ControlPoints.Count;
+            var segments = stepsProp.intValue * splineViewer.Spline.ControlPointCount;
             for (var i = 0; i < segments; i++)
             {
                 var t = i / (float) (segments - 1);
@@ -101,7 +104,7 @@ namespace Unigeo.Editor
 
         Vector3 ShowPoint(int i)
         {
-            if (i >= splineViewer.Spline.ControlPoints.Count || i < 0) return Vector3.zero;
+            if (i >= splineViewer.Spline.ControlPointCount || i < 0) return Vector3.zero;
 
             var point = handleTransform.TransformPoint(splineViewer.Spline.GetControlPoint(i));
             var size = HandleUtility.GetHandleSize(point);

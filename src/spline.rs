@@ -19,17 +19,36 @@ pub struct CatMullRommSpline {
 
 impl CatMullRommSpline {
     pub fn new(closed: bool) -> Self {
+        let control_points = vec![
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(2.0, 0.0, 0.0),
+            Vec3::new(3.0, 0.0, 0.0),
+            Vec3::new(4.0, 0.0, 0.0),
+        ];
+
         CatMullRommSpline {
-            control_points: RefCell::new(Vec::new()),
+            control_points: RefCell::new(control_points),
             closed,
         }
+    }
+
+    pub fn closed(&self) -> bool {
+        self.closed
+    }
+
+    pub fn control_point_count(&self) -> usize {
+        self.control_points.borrow().len()
     }
 
     pub fn add_control_point(&self, p: Vec3) {
         self.control_points.borrow_mut().push(p);
     }
 
-    pub fn set_control_points(&self, i: usize, p: Vec3) {
+    pub fn get_control_point(&self, i: usize) -> Vec3 {
+        self.control_points.borrow()[i]
+    }
+
+    pub fn set_control_point(&self, i: usize, p: Vec3) {
         self.control_points.borrow_mut()[i] = p;
     }
 
@@ -40,7 +59,7 @@ impl CatMullRommSpline {
     pub fn calculate_point(&self, t: f32) -> Vec3 {
         let control_points = self.control_points.borrow();
         let l = control_points.len();
-        let progress = (l as f32 - (if self.closed { 0.0 } else { 1.0 })) * t;
+        let progress = (l - (if self.closed { 0 } else { 1 })) as f32 * t;
 
         let mut i = progress.floor() as usize;
         let mut weight = progress - i as f32;
@@ -84,6 +103,6 @@ impl CatMullRommSpline {
             p1 - p0
         };
 
-        cubic_hermite(p0, p1, v0, v1, t)
+        cubic_hermite(p0, p1, v0, v1, weight)
     }
 }

@@ -99,6 +99,8 @@ namespace Unigeo
     [Serializable]
     public class CatMullRommSpline : Spline
     {
+        public int ControlPointCount => ControlPoints.Count;
+
         public CatMullRommSpline(bool closed) : base(closed)
         {
         }
