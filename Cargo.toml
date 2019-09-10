@@ -1,0 +1,11 @@
+[package]
+name = "unigeo"
+version = "0.1.0"
+authors = ["hadashiA <dev@hadashikick.jp>"]
+edition = "2018"
+
+[lib]
+name = "unigeo"
+crate-type = ["dylib"]
+
+[dependencies]
